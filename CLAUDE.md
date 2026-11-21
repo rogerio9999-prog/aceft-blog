@@ -10,7 +10,7 @@ Site institucional: https://aceft.com.br (hospedado na Locaweb, fora deste repos
 ## Estrutura
 
 - `posts/*.md`: um arquivo por artigo. **É aqui que o conteúdo diário entra.**
-- `build.py`: gera o site em `_site/` (listagem na página inicial, temas, artigos, RSS, sitemap, robots.txt).
+- `build.py`: gera o site em `_site/` (página inicial, temas, **tags** `/tag/slug/`, artigos, página **/sobre/**, página de **busca** `/buscar/` com `search-index.json`, RSS, sitemap, robots.txt). Inclui dados estruturados (Organization/AccountingService, WebSite, BlogPosting, BreadcrumbList e FAQPage) e a verificação do Bing Webmaster Tools (`msvalidate.01`). O Google é verificado pela propriedade de domínio `aceft.com.br` (não precisa de tag).
 - `style.css`, `assets/`: visual e imagens (mesma identidade do aceft.com.br).
 - `CNAME`: domínio do GitHub Pages (blog.aceft.com.br).
 - `.github/workflows/deploy.yml`: publica no GitHub Pages a cada push na `main` e todo dia às 06:00.
@@ -42,9 +42,16 @@ Texto em Markdown, começando direto pelo problema do leitor (sem repetir o tít
 
 - Use aspas no título quando ele tiver dois-pontos ou caracteres especiais.
 - Categorias válidas (exatamente assim): `Laudos Técnicos`, `Créditos de ICMS`, `PIS e COFINS`, `Recuperação de Créditos`, `Ativo Imobilizado`, `Classificação Fiscal`, `Reforma Tributária`.
-- Campos opcionais: `atualizado: AAAA-MM-DD`, `autor`, `slug`.
+- Campos opcionais: `atualizado: AAAA-MM-DD`, `autor`, `slug`, `faq`.
 - `checagem` **não aparece no site**: serve só para a revisão.
 - Post com `data` futura só aparece no site a partir daquele dia.
+- **`faq` (opcional, recomendado):** lista de 2 a 4 pares `Pergunta? | Resposta.` (um por linha, com `  - `). Vira uma seção "Perguntas frequentes" no fim do post e gera o dado estruturado `FAQPage` (pode render resultado rico no Google). A resposta é texto puro, curta e sem travessão. Exemplo:
+  ```yaml
+  faq:
+    - O crédito de ICMS da energia vale para o comércio? | Em regra não: a regra geral adiou esse crédito. Há exceções para atividades de transformação, que dependem da legislação do estado.
+    - Posso recuperar energia dos anos anteriores? | Sim, em regra os últimos cinco anos, conforme o art. 23 da LC 87/1996 e o procedimento do estado.
+  ```
+- **Tags:** reaproveite tags já usadas (veja outros posts) em vez de criar sinônimos. Uma tag só vira página própria (`/tag/slug/`) quando aparece em 2 ou mais posts, então tags consistentes constroem páginas de cauda longa.
 
 ## Rotina diária: 3 posts
 
@@ -74,6 +81,7 @@ Antes de escrever, **liste os arquivos em `posts/`** e não repita temas já cob
 - Abrir com o problema do leitor (um crédito que a empresa deixa de aproveitar, um risco na fiscalização), não com definição.
 - Subtítulos `##`, listas curtas, **um exemplo numérico ilustrativo** sempre que houver cálculo (refaça as contas com Python) e tabelas quando houver comparação.
 - Linkar 1 ou 2 posts relacionados do próprio blog (`/slug/`) quando existirem.
+- Preencher o campo `faq` com 2 a 4 perguntas que o leitor realmente faria (bom para SEO e para o dado estruturado `FAQPage`).
 - Terminar com um "o que fazer agora" prático (documentos a separar, o que conferir no SPED etc.). O convite para falar com a AC&FT já é inserido automaticamente: não repita.
 
 ### Revisão final (obrigatória, antes de abrir o PR)

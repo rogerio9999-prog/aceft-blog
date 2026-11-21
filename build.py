@@ -38,18 +38,66 @@ BLOG_NAME = "Blog AC&FT"
 AUTOR_PADRAO = "Equipe AC&FT"
 WHATSAPP = "https://wa.me/5534991516719"
 EMAIL = "rogerio@aceft.com.br"
+TELEFONE = "+55 34 99151-6719"
+CIDADE = "Uberaba"
+UF = "MG"
+AUTOR_RESPONSAVEL = "Rogério Lima Teixeira"
+REGISTRO_PROFISSIONAL = "MG-092937/O"
+# Verificação do Bing Webmaster Tools (Google é por propriedade de domínio, não precisa de tag).
+BING_SITE_VERIFICATION = "D41AB44FBD3B96958E593913C785F8E3"
+# Tags com ao menos este número de posts ganham página própria (/tag/slug/).
+TAG_MIN_POSTS = 2
 POSTS_PER_PAGE = 12
 BRT = timezone(timedelta(hours=-3))
 
 OG_IMAGE = SITE_URL + "/assets/og-image.png"
+
+# Dados estruturados do site inteiro (Organização + WebSite com caixa de busca).
+ORG_LD = {
+    "@context": "https://schema.org",
+    "@type": ["Organization", "AccountingService"],
+    "@id": MAIN_SITE + "/#organizacao",
+    "name": SITE_NAME,
+    "alternateName": "AC&FT",
+    "url": MAIN_SITE,
+    "logo": SITE_URL + "/assets/icon-512.png",
+    "image": OG_IMAGE,
+    "email": EMAIL,
+    "telephone": TELEFONE,
+    "areaServed": {"@type": "Country", "name": "Brasil"},
+    "address": {"@type": "PostalAddress", "addressLocality": CIDADE,
+                "addressRegion": UF, "addressCountry": "BR"},
+    "founder": {"@type": "Person", "name": AUTOR_RESPONSAVEL},
+    "knowsAbout": ["Crédito de ICMS", "PIS e COFINS", "Laudos técnicos tributários",
+                   "Ativo imobilizado", "Classificação fiscal (NCM)", "Reforma Tributária"],
+    "sameAs": [MAIN_SITE],
+}
+WEBSITE_LD = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": SITE_URL + "/#website",
+    "url": SITE_URL + "/",
+    "name": BLOG_NAME,
+    "inLanguage": "pt-BR",
+    "publisher": {"@id": MAIN_SITE + "/#organizacao"},
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/buscar/?q={search_term_string}"},
+        "query-input": "required name=search_term_string",
+    },
+}
+SITE_LD = json.dumps([ORG_LD, WEBSITE_LD], ensure_ascii=False)
+
 HEAD_EXTRA = f"""<meta property="og:image" content="{OG_IMAGE}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Blog AC&amp;FT: laudos técnicos, ICMS, ativo imobilizado e recuperação de créditos">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="msvalidate.01" content="{BING_SITE_VERIFICATION}">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/assets/icon-512.png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">"""
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script type="application/ld+json">{SITE_LD}</script>"""
 
 CATEGORIES = {
     "Laudos Técnicos": "laudos-tecnicos",
@@ -82,6 +130,8 @@ class Post:
     tags: list[str] = field(default_factory=list)
     autor: str = "Equipe AC&FT"
     rascunho: bool = False
+    faq: list[str] = field(default_factory=list)
+    headings: list[tuple[str, str]] = field(default_factory=list)
 
     @property
     def url(self) -> str:
@@ -143,7 +193,7 @@ def parse_date(v: str, path: Path, campo: str) -> date:
         raise ValueError(f"{path.name}: '{campo}' deve estar no formato AAAA-MM-DD (recebi {v!r})")
 
 
-def render_markdown(body: str) -> str:
+def render_markdown(body: str) -> tuple[str, list[tuple[str, str]]]:
     md = markdown.Markdown(
         extensions=["extra", "sane_lists", "toc"],
         extension_configs={"toc": {"slugify": lambda v, sep: slugify(v), "permalink": False}},
@@ -153,7 +203,9 @@ def render_markdown(body: str) -> str:
     out = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', out)
     # tabelas roláveis no celular
     out = out.replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
-    return out
+    # subtítulos de nível 2, para montar o sumário (índice) do artigo
+    headings = [(t.get("id", ""), t.get("name", "")) for t in getattr(md, "toc_tokens", []) if t.get("level") == 2]
+    return out, headings
 
 
 def load_posts(incluir_rascunhos: bool) -> list[Post]:
@@ -180,6 +232,9 @@ def load_posts(incluir_rascunhos: bool) -> list[Post]:
             if slug in slugs:
                 raise ValueError(f"{path.name}: slug '{slug}' repetido")
             slugs.add(slug)
+            faq = meta.get("faq", []) if isinstance(meta.get("faq", []), list) else [meta["faq"]]
+            faq = [f for f in faq if "|" in f]  # cada item: "Pergunta? | Resposta."
+            corpo_html, headings = render_markdown(body)
             post = Post(
                 slug=slug,
                 titulo=meta["titulo"],
@@ -191,8 +246,10 @@ def load_posts(incluir_rascunhos: bool) -> list[Post]:
                 tags=meta.get("tags", []) if isinstance(meta.get("tags", []), list) else [meta["tags"]],
                 autor=meta.get("autor", AUTOR_PADRAO),
                 rascunho=str(meta.get("rascunho", "false")).lower() in ("true", "sim", "1"),
-                html=render_markdown(body),
+                html=corpo_html,
                 palavras=len(re.findall(r"\w+", body)),
+                faq=faq,
+                headings=headings,
             )
         except ValueError as e:
             erros.append(str(e))
@@ -213,6 +270,9 @@ def load_posts(incluir_rascunhos: bool) -> list[Post]:
 # --------------------------------------------------------------------------- #
 e = html.escape
 
+# Preenchido em build(): nome da tag -> slug, só para tags com página própria (/tag/slug/).
+TAG_SLUGS: dict[str, str] = {}
+
 
 def data_br(d: date) -> str:
     return f"{d.day} de {MESES[d.month - 1]} de {d.year}"
@@ -229,9 +289,10 @@ def header() -> str:
     <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
     <ul class="nav-links" id="navLinks">
       <li><a href="/" class="is-active">Artigos</a></li>
+      <li><a href="/buscar/">Buscar</a></li>
       <li><a href="{MAIN_SITE}/#servicos">Serviços</a></li>
       <li><a href="{MAIN_SITE}/#empresa">A Empresa</a></li>
-      <li><a href="{MAIN_SITE}/#contato">Contato</a></li>
+      <li><a href="/sobre/">Sobre</a></li>
       <li><a class="btn btn--accent" href="{WHATSAPP}" target="_blank" rel="noopener">Fale com um especialista</a></li>
     </ul>
   </div>
@@ -257,6 +318,7 @@ def footer() -> str:
       <div>
         <h4>Contato</h4>
         <ul>
+          <li><a href="/sobre/">Sobre o autor</a></li>
           <li><a href="{WHATSAPP}" target="_blank" rel="noopener">WhatsApp (34) 99151-6719</a></li>
           <li><a href="mailto:{EMAIL}">{EMAIL}</a></li>
           <li>Uberaba/MG, atendimento em todo o Brasil</li>
@@ -282,8 +344,9 @@ def footer() -> str:
 
 
 def page(*, title: str, description: str, path: str, body: str, og_type: str = "website",
-         extra_head: str = "") -> str:
+         extra_head: str = "", noindex: bool = False) -> str:
     url = SITE_URL + path
+    robots = '<meta name="robots" content="noindex,follow">\n' if noindex else ""
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -292,7 +355,7 @@ def page(*, title: str, description: str, path: str, body: str, og_type: str = "
 <title>{e(title)}</title>
 <meta name="description" content="{e(description)}">
 <meta name="theme-color" content="#001e2e">
-<link rel="canonical" href="{url}">
+{robots}<link rel="canonical" href="{url}">
 <meta property="og:type" content="{og_type}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(description)}">
@@ -354,7 +417,8 @@ def pagination(base: str, atual: int, total: int) -> str:
 
 
 def listing_pages(posts: list[Post], base: str, titulo: str, subtitulo: str,
-                  ativa: str | None, contagem: dict[str, int], titulo_pagina: str) -> dict[str, str]:
+                  ativa: str | None, contagem: dict[str, int], titulo_pagina: str,
+                  extra_head: str = "") -> dict[str, str]:
     pages = {}
     total = max(1, -(-len(posts) // POSTS_PER_PAGE))
     for n in range(1, total + 1):
@@ -392,8 +456,66 @@ def listing_pages(posts: list[Post], base: str, titulo: str, subtitulo: str,
   </div>
 </section>"""
         pages[path] = page(title=f"{titulo_pagina}{sufixo}", description=re.sub(r"<[^>]+>", "", subtitulo),
-                           path=path, body=body)
+                           path=path, body=body, extra_head=extra_head if n == 1 else "")
     return pages
+
+
+def breadcrumb_ld(trilha: list[tuple[str, str]]) -> dict:
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": i + 1, "name": nome, "item": SITE_URL + href}
+            for i, (nome, href) in enumerate(trilha)
+        ],
+    }
+
+
+def toc_html(headings: list[tuple[str, str]]) -> str:
+    """Sumário do artigo, só quando há 3 ou mais subtítulos."""
+    itens = [(hid, nome) for hid, nome in headings if hid]
+    if len(itens) < 3:
+        return ""
+    lis = "".join(f'<li><a href="#{e(hid)}">{e(nome)}</a></li>' for hid, nome in itens)
+    return (f'<nav class="toc" aria-label="Neste artigo"><p class="toc-title">Neste artigo</p>'
+            f'<ol>{lis}</ol></nav>')
+
+
+def split_faq(item: str) -> tuple[str, str]:
+    pergunta, resposta = (x.strip() for x in item.split("|", 1))
+    return pergunta, resposta
+
+
+def faq_html(faq: list[str]) -> str:
+    if not faq:
+        return ""
+    blocos = "".join(
+        f'<details class="faq-item"><summary>{e(p)}</summary><p>{e(r)}</p></details>'
+        for p, r in (split_faq(i) for i in faq)
+    )
+    return f'<section class="post-faq"><h2>Perguntas frequentes</h2>{blocos}</section>'
+
+
+def faq_ld(faq: list[str]) -> dict:
+    return {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": p,
+             "acceptedAnswer": {"@type": "Answer", "text": r}}
+            for p, r in (split_faq(i) for i in faq)
+        ],
+    }
+
+
+def tags_html(tags: list[str]) -> str:
+    if not tags:
+        return ""
+    itens = []
+    for t in tags:
+        s = TAG_SLUGS.get(t)
+        itens.append(f'<li><a href="/tag/{s}/">{e(t)}</a></li>' if s else f"<li>{e(t)}</li>")
+    return '<ul class="post-tags">' + "".join(itens) + "</ul>"
 
 
 def post_page(p: Post, relacionados: list[Post]) -> str:
@@ -410,9 +532,7 @@ def post_page(p: Post, relacionados: list[Post]) -> str:
 </section>"""
     atualizado = (f' · atualizado em <time datetime="{p.atualizado.isoformat()}">{data_br(p.atualizado)}</time>'
                   if p.atualizado else "")
-    tags = ""
-    if p.tags:
-        tags = '<ul class="post-tags">' + "".join(f"<li>{e(t)}</li>" for t in p.tags) + "</ul>"
+    tags = tags_html(p.tags)
     ld = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
@@ -424,28 +544,37 @@ def post_page(p: Post, relacionados: list[Post]) -> str:
         "mainEntityOfPage": SITE_URL + p.url,
         "articleSection": p.categoria,
         "keywords": ", ".join(p.tags),
-        "author": {"@type": "Organization", "name": SITE_NAME, "url": MAIN_SITE},
-        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": MAIN_SITE,
+        "author": {"@type": "Person", "name": AUTOR_RESPONSAVEL,
+                   "jobTitle": "Técnico em Contabilidade", "url": SITE_URL + "/sobre/",
+                   "worksFor": {"@id": MAIN_SITE + "/#organizacao"}},
+        "publisher": {"@id": MAIN_SITE + "/#organizacao", "@type": "Organization", "name": SITE_NAME,
+                      "url": MAIN_SITE,
                       "logo": {"@type": "ImageObject", "url": SITE_URL + "/assets/icon-512.png"}},
         "image": OG_IMAGE,
     }
+    grafo = [ld, breadcrumb_ld([("Blog", "/"), (p.categoria, f"/categoria/{p.cat_slug}/"), (p.titulo, p.url)])]
+    if p.faq:
+        grafo.append(faq_ld(p.faq))
     extra = (f'<meta property="article:published_time" content="{p.data.isoformat()}">\n'
-             f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>')
+             + "\n".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False)}</script>'
+                         for x in grafo))
     wa = WHATSAPP + "?text=" + quote_wa("Olá! Li o artigo “" + p.titulo + "” no blog da AC&FT e gostaria de uma avaliação.")
     body = f"""<section class="hero hero--post">
   <div class="wrap wrap--post">
     <nav class="breadcrumb" aria-label="Você está em"><a href="/">Blog</a> / <a href="/categoria/{p.cat_slug}/">{e(p.categoria)}</a></nav>
     <h1>{e(p.titulo)}</h1>
     <p class="lead">{e(p.resumo)}</p>
-    <p class="post-byline">{e(p.autor)} · <time datetime="{p.data.isoformat()}">{data_br(p.data)}</time>{atualizado} · {p.leitura} min de leitura</p>
+    <p class="post-byline"><a href="/sobre/">{e(p.autor)}</a> · <time datetime="{p.data.isoformat()}">{data_br(p.data)}</time>{atualizado} · {p.leitura} min de leitura</p>
   </div>
 </section>
 
 <article class="section section--post">
   <div class="wrap wrap--post">
+    {toc_html(p.headings)}
     <div class="prose">
 {p.html}
     </div>
+    {faq_html(p.faq)}
     {tags}
 
     <aside class="post-sources">
@@ -453,6 +582,7 @@ def post_page(p: Post, relacionados: list[Post]) -> str:
       <ul>
 {fontes}
       </ul>
+      <p class="post-revisor">Responsável técnico: <a href="/sobre/">{e(AUTOR_RESPONSAVEL)}</a>, Técnico em Contabilidade (registro {e(REGISTRO_PROFISSIONAL)}).</p>
       <p class="post-disclaimer">Conteúdo informativo, atualizado na data de publicação. A legislação tributária muda com frequência e cada empresa tem particularidades: o direito ao crédito depende de análise do caso concreto.</p>
     </aside>
 
@@ -481,6 +611,127 @@ def fonte_html(f: str) -> str:
         if url.startswith("http"):
             return f'<a href="{e(url)}" target="_blank" rel="noopener">{e(desc)}</a>'
     return e(f)
+
+
+def sobre_page() -> str:
+    pessoa = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": SITE_URL + "/sobre/#responsavel",
+        "name": AUTOR_RESPONSAVEL,
+        "jobTitle": "Técnico em Contabilidade",
+        "worksFor": {"@id": MAIN_SITE + "/#organizacao"},
+        "url": SITE_URL + "/sobre/",
+        "email": EMAIL,
+        "knowsAbout": ORG_LD["knowsAbout"],
+        "sameAs": [MAIN_SITE],
+    }
+    extra = ('<script type="application/ld+json">'
+             + json.dumps([pessoa, breadcrumb_ld([("Blog", "/"), ("Sobre", "/sobre/")])], ensure_ascii=False)
+             + "</script>")
+    body = f"""<section class="hero hero--post">
+  <div class="wrap wrap--post">
+    <nav class="breadcrumb" aria-label="Você está em"><a href="/">Blog</a> / Sobre</nav>
+    <h1>Sobre o blog e o responsável técnico</h1>
+    <p class="lead">Quem escreve e revisa o conteúdo da AC&amp;FT sobre créditos tributários, laudos técnicos e ativo imobilizado.</p>
+  </div>
+</section>
+
+<article class="section section--post">
+  <div class="wrap wrap--post">
+    <div class="prose">
+<h2>Responsável técnico</h2>
+<p><strong>{e(AUTOR_RESPONSAVEL)}</strong> é Técnico em Contabilidade (registro {e(REGISTRO_PROFISSIONAL)}) e responsável técnico da {e(SITE_NAME)}, em {e(CIDADE)} ({UF}), com atendimento em todo o Brasil.</p>
+<p>A atuação concentra-se em recuperação de créditos tributários de ICMS, PIS e COFINS; laudos técnicos de crédito de ICMS sobre energia elétrica, combustíveis, gás combustível e telecomunicações; laudos de perda; gestão de ativo imobilizado (inventário físico com TAGs, vida útil, depreciação e CIAP); classificação fiscal (NCM); e adequação à Reforma Tributária (classificação para IBS e CBS).</p>
+<h2>Como o conteúdo é produzido</h2>
+<p>Os artigos são produzidos pela equipe da AC&amp;FT e passam por revisão técnica antes da publicação. Cada texto cita as fontes oficiais em que se baseia, como Planalto, Receita Federal, CONFAZ, Secretarias de Estado de Fazenda, STJ, STF, CARF, CPC e CFC.</p>
+<p>O conteúdo é informativo e não substitui a análise do caso concreto. A legislação tributária muda com frequência e cada empresa tem particularidades: o direito ao crédito depende de avaliação específica.</p>
+<h2>Contato</h2>
+<p>WhatsApp <a href="{WHATSAPP}" target="_blank" rel="noopener">(34) 99151-6719</a>, e-mail <a href="mailto:{EMAIL}">{EMAIL}</a>, site <a href="{MAIN_SITE}/" target="_blank" rel="noopener">aceft.com.br</a>.</p>
+    </div>
+
+    <div class="post-cta">
+      <h2>Sua empresa pode ter créditos a recuperar?</h2>
+      <p>Fale com a AC&amp;FT para uma avaliação do potencial tributário da sua empresa.</p>
+      <a class="btn btn--accent" href="{WHATSAPP}" target="_blank" rel="noopener">Falar no WhatsApp</a>
+    </div>
+  </div>
+</article>"""
+    return page(title=f"Sobre o blog e o responsável técnico | {BLOG_NAME}",
+                description=f"{AUTOR_RESPONSAVEL}, Técnico em Contabilidade (registro {REGISTRO_PROFISSIONAL}), "
+                            "responsável técnico da AC&FT: créditos tributários, laudos técnicos e ativo imobilizado.",
+                path="/sobre/", body=body, extra_head=extra)
+
+
+def search_index(posts: list[Post]) -> str:
+    dados = [{"t": p.titulo, "r": p.resumo, "u": p.url, "c": p.categoria,
+              "g": " ".join(p.tags), "d": data_curta(p.data)} for p in posts]
+    return json.dumps(dados, ensure_ascii=False, separators=(",", ":"))
+
+
+def buscar_page() -> str:
+    body = """<section class="hero hero--post">
+  <div class="wrap wrap--post">
+    <nav class="breadcrumb" aria-label="Você está em"><a href="/">Blog</a> / Buscar</nav>
+    <h1>Buscar no blog</h1>
+    <p class="lead">Procure por tema, tributo ou termo fiscal (ICMS, CIAP, PER/DCOMP, NCM, energia elétrica).</p>
+    <form class="search-form" role="search" onsubmit="return false;">
+      <input type="search" id="q" name="q" placeholder="Digite um termo e veja os artigos" autocomplete="off" aria-label="Buscar no blog">
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="search-status" id="status" aria-live="polite"></p>
+    <div class="post-grid" id="resultados"></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g, ""); };
+  var input = document.getElementById("q");
+  var status = document.getElementById("status");
+  var out = document.getElementById("resultados");
+  var dados = [];
+  var esc = function (s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; };
+
+  function card(p) {
+    return '<article class="post-card"><a href="' + p.u + '">' +
+      '<span class="post-cat">' + esc(p.c) + '</span>' +
+      '<h3>' + esc(p.t) + '</h3><p>' + esc(p.r) + '</p>' +
+      '<span class="post-meta">' + esc(p.d) + '</span></a></article>';
+  }
+  function render(q) {
+    var termos = norm(q).split(/\\s+/).filter(Boolean);
+    if (!termos.length) { out.innerHTML = ""; status.textContent = "Digite um termo para buscar entre " + dados.length + " artigos."; return; }
+    var r = dados.filter(function (p) {
+      var alvo = norm(p.t + " " + p.r + " " + p.c + " " + p.g);
+      return termos.every(function (t) { return alvo.indexOf(t) !== -1; });
+    });
+    status.textContent = r.length ? (r.length + " artigo(s) para \\u201c" + q + "\\u201d") : ("Nenhum artigo para \\u201c" + q + "\\u201d.");
+    out.innerHTML = r.slice(0, 60).map(card).join("");
+  }
+  function start() {
+    var q = new URLSearchParams(location.search).get("q") || "";
+    input.value = q;
+    render(q);
+    input.addEventListener("input", function () {
+      render(input.value);
+      var u = input.value ? ("?q=" + encodeURIComponent(input.value)) : location.pathname;
+      history.replaceState(null, "", u);
+    });
+    input.focus();
+  }
+  fetch("/search-index.json").then(function (r) { return r.json(); })
+    .then(function (j) { dados = j; start(); })
+    .catch(function () { status.textContent = "Não foi possível carregar o índice de busca."; });
+})();
+</script>"""
+    return page(title=f"Buscar no blog | {BLOG_NAME}",
+                description="Busque artigos do blog da AC&FT por tema, tributo ou termo fiscal.",
+                path="/buscar/", body=body, noindex=True)
 
 
 # --------------------------------------------------------------------------- #
@@ -542,7 +793,25 @@ def build(incluir_rascunhos: bool = False) -> list[Post]:
             shutil.copy2(src, OUT / src.name)
 
     contagem = {c: sum(1 for p in posts if p.categoria == c) for c in CATEGORIES}
-    listados = ["/"]
+    listados = ["/", "/sobre/"]
+
+    # Índice de tags por slug. Só ganham página própria as tags com ao menos TAG_MIN_POSTS posts.
+    tag_posts: dict[str, list[Post]] = {}
+    tag_nome: dict[str, str] = {}
+    for p in posts:
+        vistos = set()
+        for t in p.tags:
+            s = slugify(t)
+            if not s or s in vistos:
+                continue
+            vistos.add(s)
+            tag_posts.setdefault(s, []).append(p)
+            tag_nome.setdefault(s, t)
+    TAG_SLUGS.clear()
+    for t in {tag for p in posts for tag in p.tags}:
+        s = slugify(t)
+        if s and len(tag_posts.get(s, [])) >= TAG_MIN_POSTS:
+            TAG_SLUGS[t] = s
 
     for path, content in listing_pages(
             posts, "/", "Créditos tributários <em>na prática</em>",
@@ -557,14 +826,34 @@ def build(incluir_rascunhos: bool = False) -> list[Post]:
             continue
         base = f"/categoria/{s}/"
         listados.append(base)
+        bc = ('<script type="application/ld+json">'
+              + json.dumps(breadcrumb_ld([("Blog", "/"), (cat, base)]), ensure_ascii=False) + "</script>")
         for path, content in listing_pages(doc, base, e(cat), f"Todos os artigos sobre {cat}.",
-                                           cat, contagem, f"{cat} | {BLOG_NAME}").items():
+                                           cat, contagem, f"{cat} | {BLOG_NAME}", extra_head=bc).items():
             write(path, content)
 
     for p in posts:
         mesma = [r for r in posts if r is not p and r.categoria == p.categoria]
         outras = [r for r in posts if r is not p and r.categoria != p.categoria]
         write(p.url, post_page(p, (mesma + outras)[:3]))
+
+    # Páginas de tag (cauda longa), ordenadas pelo slug
+    for s in sorted(tag_posts):
+        lst = tag_posts[s]
+        if len(lst) < TAG_MIN_POSTS:
+            continue
+        nome = tag_nome[s]
+        base = f"/tag/{s}/"
+        listados.append(base)
+        bc = ('<script type="application/ld+json">'
+              + json.dumps(breadcrumb_ld([("Blog", "/"), (nome, base)]), ensure_ascii=False) + "</script>")
+        for path, content in listing_pages(lst, base, e(nome), f"Artigos com a tag {e(nome)}.",
+                                           None, contagem, f"{nome} | {BLOG_NAME}", extra_head=bc).items():
+            write(path, content)
+
+    write("/sobre/", sobre_page())
+    write("/buscar/", buscar_page())
+    write("/search-index.json", search_index(posts))
 
     write("/feed.xml", feed(posts))
     write("/sitemap.xml", sitemap(posts, listados))
