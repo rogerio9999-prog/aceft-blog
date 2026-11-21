@@ -7,7 +7,7 @@ tags: [PIS, COFINS, insumos, crédito, não cumulatividade, STJ]
 fontes:
   - Lei nº 10.637/2002 (PIS não cumulativo), art. 3º | https://www.planalto.gov.br/ccivil_03/leis/2002/l10637.htm
   - Lei nº 10.833/2003 (COFINS não cumulativa), art. 3º | https://www.planalto.gov.br/ccivil_03/leis/2003/l10.833.htm
-  - Parecer Normativo Cosit/RFB nº 5/2018 (conceito de insumo após o julgamento do STJ) | http://normas.receita.fazenda.gov.br/sijut2consulta/link.action?idAto=92278
+  - Parecer Normativo Cosit/RFB nº 5/2018 (conceito de insumo após o julgamento do STJ) | https://www.gov.br/pgfn/pt-br/assuntos/representacao-judicial/parecer-normativo-cosit-05-2018.pdf
   - Superior Tribunal de Justiça, REsp nº 1.221.170/PR | https://processo.stj.jus.br/processo/pesquisa/?num_registro=201002091150
 checagem:
   - Os valores do exemplo são ilustrativos
