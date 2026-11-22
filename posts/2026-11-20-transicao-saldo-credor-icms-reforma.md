@@ -2,7 +2,7 @@
 titulo: "Saldo credor de ICMS na Reforma Tributária: o que acontece com ele depois de 2032"
 resumo: O ICMS acaba em 2033, mas o saldo credor acumulado não se perde. A LC 227/2026 detalhou homologação, prazos, compensação com IBS em 240 parcelas, transferência e ressarcimento. Veja as regras e um exemplo.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [saldo credor de ICMS, transição, IBS, LC 227/2026, homologação]
 fontes:
   - Constituição Federal, ADCT, art. 134 (saldos credores do ICMS) | https://www.planalto.gov.br/ccivil_03/constituicao/constituicaocompilado.htm

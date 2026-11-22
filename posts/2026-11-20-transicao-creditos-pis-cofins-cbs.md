@@ -2,7 +2,7 @@
 titulo: "O que acontece com os créditos de PIS e COFINS quando a CBS entrar em 2027"
 resumo: PIS e COFINS deixam de existir em 2027, mas os créditos não usados continuam valendo. Veja como a LC 214/2025 trata o saldo credor, os créditos sobre depreciação, as devoluções e o estoque, com exemplo ilustrativo.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [PIS/COFINS, CBS, transição, saldo credor, crédito presumido]
 fontes:
   - Lei Complementar nº 214/2025, arts. 346 a 348 e 378 a 381 | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm

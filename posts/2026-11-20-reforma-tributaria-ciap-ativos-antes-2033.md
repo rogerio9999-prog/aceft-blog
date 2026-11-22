@@ -2,7 +2,7 @@
 titulo: "CIAP na Reforma Tributária: o que acontece com o crédito de ICMS dos ativos comprados antes de 2033"
 resumo: Bens do ativo comprados até 2032 continuam gerando crédito de ICMS em 48 parcelas. As parcelas que sobrarem em 2033 viram compensação com o IBS, desde que homologadas. Veja as regras da LC 227/2026 e um exemplo.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [CIAP, ativo imobilizado, ICMS, IBS, transição]
 fontes:
   - Lei Complementar nº 87/1996, art. 20, § 5º (CIAP) e art. 31-A (redução de alíquotas de 2029 a 2032) | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp87.htm

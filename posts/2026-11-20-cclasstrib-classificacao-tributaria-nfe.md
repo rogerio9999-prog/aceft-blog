@@ -2,7 +2,7 @@
 titulo: "cClassTrib e CST do IBS e da CBS na NF-e: o que são e como escolher o código certo"
 resumo: Cada item da NF-e passa a ter um CST e um código de classificação tributária (cClassTrib) para o IBS e a CBS. Veja como as tabelas oficiais são organizadas, onde consultá-las e os cuidados no cadastro.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [cClassTrib, CST, NF-e, IBS, CBS]
 fontes:
   - Portal da Conformidade Fácil (tabelas de CST, cClassTrib, crédito presumido e assistente de classificação) | https://dfe-portal.svrs.rs.gov.br/CFF

@@ -2,7 +2,7 @@
 titulo: "Checklist: como classificar produtos e insumos para o IBS e a CBS"
 resumo: Um roteiro em 10 passos para revisar o cadastro de produtos vendidos e de insumos comprados antes de operar com IBS e CBS, da NCM ao cClassTrib, passando por anexos de redução, Imposto Seletivo e uso pessoal.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [checklist, classificação tributária, IBS, CBS, cadastro de produtos]
 fontes:
   - Lei Complementar nº 214/2025 (regimes diferenciados, anexos por NCM/SH e NBS, créditos e uso ou consumo pessoal) | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm

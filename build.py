@@ -106,7 +106,7 @@ CATEGORIES = {
     "Recuperação de Créditos": "recuperacao-de-creditos",
     "Ativo Imobilizado": "ativo-imobilizado",
     "Classificação Fiscal": "classificacao-fiscal",
-    "Reforma Tributária": "reforma-tributaria",
+    "CBS / IBS": "cbs-ibs",
 }
 REQUIRED = ["titulo", "resumo", "data", "categoria", "fontes"]
 MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho",

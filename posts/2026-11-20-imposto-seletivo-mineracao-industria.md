@@ -2,7 +2,7 @@
 titulo: "Imposto Seletivo na mineração: quais minerais entram, alíquota máxima e o que muda na exportação"
 resumo: A partir de 2027, o Imposto Seletivo incide sobre a extração de alguns bens minerais, mesmo quando exportados, com alíquota máxima de 0,25%. Veja quais códigos da NCM estão na lista, a base de cálculo e um exemplo ilustrativo.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [Imposto Seletivo, mineração, minério de ferro, petróleo e gás, LC 214/2025]
 fontes:
   - Constituição Federal, art. 153, VIII e § 6º, e ADCT, art. 126 | https://www.planalto.gov.br/ccivil_03/constituicao/constituicaocompilado.htm

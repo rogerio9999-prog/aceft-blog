@@ -41,7 +41,7 @@ Texto em Markdown, começando direto pelo problema do leitor (sem repetir o tít
 ```
 
 - Use aspas no título quando ele tiver dois-pontos ou caracteres especiais.
-- Categorias válidas (exatamente assim): `Laudos Técnicos`, `Créditos de ICMS`, `PIS e COFINS`, `Recuperação de Créditos`, `Ativo Imobilizado`, `Classificação Fiscal`, `Reforma Tributária`.
+- Categorias válidas (exatamente assim): `Laudos Técnicos`, `Créditos de ICMS`, `PIS e COFINS`, `Recuperação de Créditos`, `Ativo Imobilizado`, `Classificação Fiscal`, `CBS / IBS`.
 - Campos opcionais: `atualizado: AAAA-MM-DD`, `autor`, `slug`, `faq`.
 - `checagem` **não aparece no site**: serve só para a revisão.
 - Post com `data` futura só aparece no site a partir daquele dia.

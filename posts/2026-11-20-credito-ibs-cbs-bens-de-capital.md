@@ -2,7 +2,7 @@
 titulo: "Crédito de IBS e CBS na compra de máquinas e equipamentos: o que muda em relação ao CIAP"
 resumo: A LC 214/2025 assegura crédito integral e imediato de IBS e CBS na aquisição de bens de capital, com prazo menor de ressarcimento. Compare com o CIAP de 1/48 do ICMS e veja um exemplo ilustrativo.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [IBS, CBS, bens de capital, ativo imobilizado, CIAP]
 fontes:
   - Lei Complementar nº 214/2025, arts. 39, 40, 47, 108, 109, 380 e 406 | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm
