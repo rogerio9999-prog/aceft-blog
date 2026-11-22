@@ -640,8 +640,8 @@ def sobre_page() -> str:
 <article class="section section--post">
   <div class="wrap wrap--post">
     <div class="prose">
-<h2>Responsável técnico</h2>
-<p><strong>{e(AUTOR_RESPONSAVEL)}</strong> é Técnico em Contabilidade (registro {e(REGISTRO_PROFISSIONAL)}) e responsável técnico da {e(SITE_NAME)}, em {e(CIDADE)} ({UF}), com atendimento em todo o Brasil.</p>
+<h2>Responsável</h2>
+<p><strong>{e(AUTOR_RESPONSAVEL)}</strong> é o responsável pela empresa (portador do registro CRC-MG-092937/O) e sócio da {e(SITE_NAME)}, em {e(CIDADE)} ({UF}), com atendimento em todo o Brasil.</p>
 <p>A atuação concentra-se em recuperação de créditos tributários de ICMS, PIS e COFINS; laudos técnicos de crédito de ICMS sobre energia elétrica, combustíveis, gás combustível e telecomunicações; laudos de perda; gestão de ativo imobilizado (inventário físico com TAGs, vida útil, depreciação e CIAP); classificação fiscal (NCM); e adequação à Reforma Tributária (classificação para IBS e CBS).</p>
 <h2>Como o conteúdo é produzido</h2>
 <p>Os artigos são produzidos pela equipe da AC&amp;FT e passam por revisão técnica antes da publicação. Cada texto cita as fontes oficiais em que se baseia, como Planalto, Receita Federal, CONFAZ, Secretarias de Estado de Fazenda, STJ, STF, CARF, CPC e CFC.</p>
