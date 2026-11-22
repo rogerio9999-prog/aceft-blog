@@ -2,7 +2,7 @@
 titulo: "Split payment e capital de giro: como o recolhimento na liquidação pode afetar o caixa da indústria"
 resumo: No split payment, o IBS e a CBS são separados no momento em que o cliente paga, antes de o dinheiro chegar ao fornecedor. Veja como a LC 214/2025 desenhou o mecanismo, o cronograma gradual e um exemplo ilustrativo de efeito no caixa.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [split payment, capital de giro, IBS, CBS, fluxo de caixa]
 fontes:
   - Lei Complementar nº 214/2025, arts. 27, 31 a 36, 48 e 53 (split payment, recolhimento pelo adquirente e uso dos créditos) | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm

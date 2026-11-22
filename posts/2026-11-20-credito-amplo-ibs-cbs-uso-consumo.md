@@ -2,7 +2,7 @@
 titulo: "Crédito amplo de IBS e CBS: o fim da briga sobre uso e consumo e as exceções da LC 214/2025"
 resumo: No IBS e na CBS, a regra passa a ser o crédito sobre todas as aquisições, exceto as de uso ou consumo pessoal e outras hipóteses da lei. Veja o que entra, o que fica de fora e por que a discussão de material intermediário perde força.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [crédito amplo, IBS, CBS, uso e consumo, LC 214/2025]
 fontes:
   - Lei Complementar nº 214/2025, arts. 47 a 57 (créditos e uso ou consumo pessoal) | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm

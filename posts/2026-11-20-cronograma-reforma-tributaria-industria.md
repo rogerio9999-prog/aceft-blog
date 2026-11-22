@@ -2,7 +2,7 @@
 titulo: "Cronograma da Reforma Tributária de 2026 a 2033: o que muda a cada ano para a indústria"
 resumo: A Reforma não acontece num dia só. De 2026 a 2033, PIS, COFINS, IPI, ICMS e ISS dão lugar a CBS, IBS e Imposto Seletivo em etapas. Veja o calendário ano a ano e o que a indústria precisa preparar em cada fase.
 data: 2026-11-20
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [cronograma, Reforma Tributária, CBS, IBS, transição]
 fontes:
   - Constituição Federal, ADCT, arts. 125 a 135 (regras de transição) | https://www.planalto.gov.br/ccivil_03/constituicao/constituicaocompilado.htm
