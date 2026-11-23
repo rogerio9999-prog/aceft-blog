@@ -2,7 +2,7 @@
 titulo: "Fase de teste do IBS e da CBS em 2026: a alíquota de 1% que a empresa precisa saber calcular"
 resumo: Em 2026 a Reforma entra em fase de teste, com IBS de 0,1% e CBS de 0,9% nas notas. Veja o que apurar, como funciona a compensação com PIS e COFINS e por que o foco do ano é o sistema, não a arrecadação.
 data: 2026-11-24
-categoria: Reforma Tributária
+categoria: CBS / IBS
 tags: [Reforma Tributária, IBS, CBS, transição, PIS, COFINS]
 fontes:
   - Lei Complementar nº 214/2025 (institui o IBS, a CBS e o Imposto Seletivo) | https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm
